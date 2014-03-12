@@ -2,7 +2,8 @@ class varnish_rhel(
   $varnish_data_directory,
   $varnish_listen_port = 80,
   $varnish_storage_size = "1G",
-  $varnish_version = latest) {
+  $varnish_version = latest,
+  $varnish_secret  = undef) {
   require varnish_rhel::rpm_repo
 
   File {
@@ -36,5 +37,15 @@ class varnish_rhel(
     notify  => Service["varnish"],
     owner   => "root",
     group   => "root",
+  }
+
+  if ($varnish_secret) {
+    file { '/etc/varnish/secret':
+      ensure  => present,
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0600',
+      content => "${varnish_secret}\n",
+    }
   }
 }
